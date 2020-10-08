@@ -230,30 +230,31 @@ static void display_callback()
 
 static void keyboard_callback(unsigned char key, int, int)
 {
+  std::string vs, fs;
+
   switch (key)
   {
     case 'q':
     case 'Q':
     case 27:
               exit(0);
-
     case 'r' :
-      std::string vs = lit_fichier("color.vs");
-      std::string fs = lit_fichier(fragfile);
+      vs = lit_fichier("color.vs");
+      fs = lit_fichier(fragfile);
 
       programme = creation_programme(vs,fs);
       break;
     case 's':
       if (fragfile.compare(0,fragfile.size(), "color.fs") == 0){
           fragfile = std::string("texture.fs");
-      } else if (fragfile.compare(0,fragfile.size(), "color.fs") == 0){
+      } else if (fragfile.compare(0,fragfile.size(), "texture.fs") == 0){
           fragfile = std::string("color.fs");
       }
 
-      std::string v = lit_fichier("color.vs");
-      std::string f = lit_fichier(fragfile.c_str());
+      vs = lit_fichier("color.vs");
+      fs = lit_fichier(fragfile.c_str());
 
-      programme = creation_programme(v,f);
+      programme = creation_programme(vs,fs);
       break;
 
   }
