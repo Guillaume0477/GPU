@@ -1,9 +1,11 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #define GLEW_STATIC 1
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -142,15 +144,50 @@ void init()
   programme = creation_programme(vs,fs);
 
   // Créer un tableau de float contenant les sommets à afficher
+  float sommet_objet[] = {-1,-1,0, 1,-1,0 ,-1,1,0, 1,1,0};
+  //sommet_objet.push_back([0,0,0, 1,0,0 ,0,1,0, 1,1,0]);
+
   // Créer un ficher d'entier non signé contenant les indices de sommets
+  
+  uint indice_objet[] = {0,1,2,2,1,3};
+
   // Créer un VAO -> glGenVertexArrays(GLsizei, GLuint *)
+  glGenVertexArrays(1, &VAO);
   // Créer un VBO puis un EBO -> glGenBuffers(GLsizei, GLuint *)
+  glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
+
   // Mettre le VAO en actif dans la machine d'état -> glBindVertexArray(GLuint)
+  glBindVertexArray(VAO);
+
+  glBindBuffer(GL_ARRAY_BUFFER,VBO);
+  glBufferData(GL_ARRAY_BUFFER, 12, &sommet_objet[0], GL_STATIC_DRAW);
+  glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(0);
+
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6, &indice_objet[0], GL_STATIC_DRAW);
+
+ 
+
+  //glVertexAttribPointer(0,1,GL_FLOAT, GL_FALSE, 0, 0);
+  //glEnableVertexAttribArray(0);
   // Remplir le VBO puis l'EBO en utilisant la machine d'état.
   //  -> glBindBuffer(GLenum, GLuint) et glBufferData(GLenum, GLsizeiptr, const GLvoid*, GL_STATIC_DRAW);
   // Specifier comment parcourir les buffers crées (utilise le dernier VBO de type GL_ARRAY_BUFFER) :
   //  -> glVertexAttribPointer(GLuint, GLint, GLenum, GLboolean, glsizei, const void*)
   //      Pour l'indice, se référer au vertex shader !
+
+
+
+
+ 
+
+
+
+
+
   // Activer notre tableau de vertices : glEnableVertexAttribArray(GLuint)
   //
   // Le VAO permet de ne pas repeter les étapes de lecture des buffers à chaque affichage !
@@ -159,15 +196,15 @@ void init()
   // END TODO
 
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 
   // Pas nécéssaire mais permet de controler un peu ce qui est fait...
   // Globalement tous les GlEnable...
   // Decommenter et essayer de comprendre
-  //glEnable(GL_CULL_FACE);
-  //glFrontFace(GL_CCW);
-  //glCullFace(GL_FRONT);
-  //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glEnable(GL_CULL_FACE);
+  glFrontFace(GL_CCW);
+  glCullFace(GL_FRONT);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 // Boucle d'affichage
