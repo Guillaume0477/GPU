@@ -8,7 +8,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-unsigned int VBO, VAO, EBO;
+unsigned int VBO, VAO, EBO, programme;
 
 // Renvoi le contenu d'un fichier
 std::string lit_fichier(const std::string& filename)
@@ -69,14 +69,18 @@ int compile_shader(const char* shader_source, int shader_type)
   int success;
   char log[128];
 
-  // TODO:
+  // TODO Done:
   // Créer un shader vide -> glCreateShader(GLenum)
   // Mettre le code voulu dans le shader
   //  -> glShaderSource(GLuint, 1, const GLchar * const *, NULL);
   // Compiler le shader -> glCompileShader(GLuint);
 
   int shader_id;
-  // FIN TODO
+  shader_id = glCreateShader(shader_type);
+  glShaderSource(shader_id, 1, &shader_source, NULL);
+  glCompileShader(shader_id);
+
+  // FIN TODO Done
   glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
   if (!success)
   {
@@ -95,14 +99,21 @@ int creation_programme(const std::string& vertex_shader, const std::string& frag
   int success;
   char log[128];
 
-  // TODO:
+  // TODO Done
   // Creer le vertex et le fragment shader
-  // Creer un nouveau programmme vide GPU -> glCreateProgram()
-  // Lier les deux shader au programme GPU -> glAttachShader(GLuint, GLuint)
-  // Lier le programme a la CG -> glGetLinkProgram()
+  GLuint vi, fi, shaderProgram;
 
-  int shaderProgram;
-  // FIN TODO
+  vi = compile_shader(vertex_shader.c_str(), GL_VERTEX_SHADER);
+  fi = compile_shader(fragment_shader.c_str(), GL_FRAGMENT_SHADER);
+  // Creer un nouveau programmme vide GPU -> glCreateProgram()
+  shaderProgram = glCreateProgram();
+  // Lier les deux shader au programme GPU -> glAttachShader(GLuint, GLuint)
+  glAttachShader(shaderProgram,vi);
+  glAttachShader(shaderProgram,fi);
+  // Lier le programme a la CG -> glGetLinkProgram()
+  glLinkProgram(shaderProgram);
+
+  // FIN TODO Done
 
   glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
   if (!success) {
@@ -110,10 +121,12 @@ int creation_programme(const std::string& vertex_shader, const std::string& frag
     std::cout << "ERROR: SHADER LINKING FAILED\n" << log << std::endl;
   }
 
-  // TODO
+  // TODO Done
   // Supprimer les deux shaders -> glDeleteShader(GLuint)
+  glDeleteShader(vi);
+  glDeleteShader(fi);
 
-  // FIN TODO
+  // FIN TODO Done
 
   return shaderProgram;
 }
@@ -123,6 +136,11 @@ void init()
 {
   // TODO :
   // Lire les fichiers contenant les programmes des shaders puis les utiliser pour creer le programme
+  std::string vs = lit_fichier("color.vs");
+  std::string fs = lit_fichier("color.fs");
+
+  programme = creation_programme(vs,fs);
+
   // Créer un tableau de float contenant les sommets à afficher
   // Créer un ficher d'entier non signé contenant les indices de sommets
   // Créer un VAO -> glGenVertexArrays(GLsizei, GLuint *)
@@ -158,11 +176,14 @@ static void display_callback()
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  // TODO :
+  // TODO Done
   // Specifier le programme -> glUseProgram(GLuint)
+  glUseProgram(programme);
   // Specifier le VAO à utiliser -> glBindVertexArray(GLuint)
+  glBindVertexArray(VAO);
   // Demander affichage -> glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-  // END TODO
+  glDrawElements(GL_TRIANGLES, 6, GL_UNISGNED_INT, 0);
+  // END TODO Done
   glBindVertexArray(0);
   glutSwapBuffers ();
   // Pour afficher de nouveau
