@@ -11,6 +11,7 @@
 #include "stb_image.h"
 
 unsigned int VBO, VAO, EBO, programme;
+std::string fragfile = "color.fs";
 
 // Renvoi le contenu d'un fichier
 std::string lit_fichier(const std::string& filename)
@@ -169,7 +170,7 @@ void init()
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*sizeof(uint), &indice_objet[0], GL_STATIC_DRAW);
 
- 
+  load_texture("squirel.png");
 
   //glVertexAttribPointer(0,1,GL_FLOAT, GL_FALSE, 0, 0);
   //glEnableVertexAttribArray(0);
@@ -238,9 +239,23 @@ static void keyboard_callback(unsigned char key, int, int)
 
     case 'r' :
       std::string vs = lit_fichier("color.vs");
-      std::string fs = lit_fichier("color.fs");
+      std::string fs = lit_fichier(fragfile);
 
       programme = creation_programme(vs,fs);
+      break;
+    case 's':
+      if (fragfile.compare(0,fragfile.size(), "color.fs") == 0){
+          fragfile = std::string("texture.fs");
+      } else if (fragfile.compare(0,fragfile.size(), "color.fs") == 0){
+          fragfile = std::string("color.fs");
+      }
+
+      std::string v = lit_fichier("color.vs");
+      std::string f = lit_fichier(fragfile.c_str());
+
+      programme = creation_programme(v,f);
+      break;
+
   }
 }
 
