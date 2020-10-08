@@ -182,7 +182,7 @@ static void display_callback()
   // Specifier le VAO à utiliser -> glBindVertexArray(GLuint)
   glBindVertexArray(VAO);
   // Demander affichage -> glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNISGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   // END TODO Done
   glBindVertexArray(0);
   glutSwapBuffers ();
