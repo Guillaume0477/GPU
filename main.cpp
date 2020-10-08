@@ -235,6 +235,12 @@ static void keyboard_callback(unsigned char key, int, int)
     case 'Q':
     case 27:
               exit(0);
+
+    case 'r' :
+      std::string vs = lit_fichier("color.vs");
+      std::string fs = lit_fichier("color.fs");
+
+      programme = creation_programme(vs,fs);
   }
 }
 
