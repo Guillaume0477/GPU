@@ -10,8 +10,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-unsigned int VBO, VAO, EBO, programme;
+unsigned int VBO, VAO, EBO, VBOColors;
+unsigned int programme, p1,p2, p3, p4;
 std::string fragfile = "color.fs";
+int nbProg = 0;
+std::vector<GLuint> progs;
+float rad = 0.5;
+int sign = -1;
 
 // Renvoi le contenu d'un fichier
 std::string lit_fichier(const std::string& filename)
@@ -141,12 +146,28 @@ void init()
   // Lire les fichiers contenant les programmes des shaders puis les utiliser pour creer le programme
   std::string vs = lit_fichier("color.vs");
   std::string fs = lit_fichier("color.fs");
+  std::string fs1 = lit_fichier("redcircle.fs");
+  std::string fs2 = lit_fichier("texture.fs");
+  std::string fs3 = lit_fichier("color_grey.fs");
+  std::string fs4 = lit_fichier("color_flou.fs");
+
 
   programme = creation_programme(vs,fs);
+  p1 = creation_programme(vs, fs1);
+  p2 = creation_programme(vs,fs2);
+  p3 = creation_programme(vs,fs3);
+  p4 = creation_programme(vs, fs4);
+
+  progs.push_back(programme);
+  progs.push_back(p1);
+  progs.push_back(p2);
+  progs.push_back(p3);
+  progs.push_back(p4);
 
   // Créer un tableau de float contenant les sommets à afficher
   float sommet_objet[] = {-1.0,-1.0,0.0, 1.0,-1.0,0.0 ,-1.0,1.0,0.0, 1.0,1.0,0.0};
-  //sommet_objet.push_back([0,0,0, 1,0,0 ,0,1,0, 1,1,0]);
+  
+  float colors[] = {1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0};
 
   // Créer un ficher d'entier non signé contenant les indices de sommets
   
@@ -157,6 +178,7 @@ void init()
   // Créer un VBO puis un EBO -> glGenBuffers(GLsizei, GLuint *)
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &EBO);
+  glGenBuffers(1, &VBOColors);
 
   // Mettre le VAO en actif dans la machine d'état -> glBindVertexArray(GLuint)
   glBindVertexArray(VAO);
@@ -170,7 +192,14 @@ void init()
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*sizeof(uint), &indice_objet[0], GL_STATIC_DRAW);
 
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBOColors);
+  glBufferData(GL_ARRAY_BUFFER, 12*sizeof(float), &colors[0], GL_STATIC_DRAW);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0,0);
+  glEnableVertexAttribArray(1);
+
   load_texture("squirel.png");
+
 
   //glVertexAttribPointer(0,1,GL_FLOAT, GL_FALSE, 0, 0);
   //glEnableVertexAttribArray(0);
@@ -213,12 +242,25 @@ static void display_callback()
 {
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
+  glUseProgram(progs[nbProg]);
 
   // TODO Done
   // Specifier le programme -> glUseProgram(GLuint)
-  glUseProgram(programme);
+  // glUseProgram(progs[0]);
   // Specifier le VAO à utiliser -> glBindVertexArray(GLuint)
   glBindVertexArray(VAO);
+
+  if (rad >= 1){
+    sign = -1;
+  } else if (rad <=0) {
+    sign = 1;
+  }
+
+  rad = rad + 0.01*sign;
+
+  GLuint location = glGetUniformLocation(progs[nbProg], "radius");
+  glUniform1f(location, rad);
+
   // Demander affichage -> glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   // END TODO Done
@@ -243,20 +285,21 @@ static void keyboard_callback(unsigned char key, int, int)
       fs = lit_fichier(fragfile);
 
       programme = creation_programme(vs,fs);
+      nbProg = 0;
+      glUseProgram(progs[nbProg]);
       break;
     case 's':
-      if (fragfile.compare(0,fragfile.size(), "color.fs") == 0){
-          fragfile = std::string("texture.fs");
-      } else if (fragfile.compare(0,fragfile.size(), "texture.fs") == 0){
-          fragfile = std::string("color.fs");
+      if (nbProg < int(progs.size()-1)){
+        nbProg += 1;
       }
-
-      vs = lit_fichier("color.vs");
-      fs = lit_fichier(fragfile.c_str());
-
-      programme = creation_programme(vs,fs);
+      glUseProgram(progs[nbProg]);
       break;
-
+    case 'd':
+      if (nbProg != 0){
+        nbProg -= 1;
+      }
+      glUseProgram(progs[nbProg]);
+      break;
   }
 }
 
