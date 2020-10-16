@@ -13,7 +13,7 @@
 #include <chrono>
 
 std::vector<GLuint> Programmes;
-GLuint program_id, program_id_2, program_id_3, program_id_4;
+GLuint program_id, program_id_2, program_id_3, program_id_4, program_id_5;
 std::vector<std::vector<float>> color_array;
 int indice_couleur = 0;
 int id_prog = 0;
@@ -32,6 +32,7 @@ void init()
 
     program_id = glhelper::create_program_from_file("basic.vs", "basic.fs", "eclate.gs");
     program_id_2 = glhelper::create_program_from_file("basic.vs", "color.fs", "line.gs");
+    program_id_5 = glhelper::create_program_from_file("basic.vs", "texture_geo.fs", "gonfle.gs");
     program_id_3 = glhelper::create_program_from_file("basic.vs", "texture.fs");
     program_id_4 = glhelper::create_program_from_file("basic.vs", "change_color.fs", "basic.gs");
     
@@ -39,6 +40,7 @@ void init()
     Programmes.push_back(program_id_2);
     Programmes.push_back(program_id_3);
     Programmes.push_back(program_id_4);
+    Programmes.push_back(program_id_5);
     Mesh m = Mesh::load_from_file("data/Frankie/Frankie.obj");
     m.compute_normales();
     n_elements= m.size_element();
