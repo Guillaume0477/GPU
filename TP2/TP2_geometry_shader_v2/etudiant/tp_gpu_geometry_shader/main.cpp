@@ -10,10 +10,10 @@
 #include "camera.h"
 
 #include "external/glm/gtc/matrix_transform.hpp"
-
+#include <chrono>
 
 std::vector<GLuint> Programmes;
-GLuint program_id, program_id_2;
+GLuint program_id, program_id_2, program_id_3, program_id_4;
 std::vector<std::vector<float>> color_array;
 int indice_couleur = 0;
 int id_prog = 0;
@@ -32,9 +32,13 @@ void init()
 
     program_id = glhelper::create_program_from_file("basic.vs", "basic.fs");
     program_id_2 = glhelper::create_program_from_file("basic.vs", "color.fs");
+    program_id_3 = glhelper::create_program_from_file("basic.vs", "texture.fs");
+    program_id_4 = glhelper::create_program_from_file("basic.vs", "change_color.fs");
     
     Programmes.push_back(program_id);
     Programmes.push_back(program_id_2);
+    Programmes.push_back(program_id_3);
+    Programmes.push_back(program_id_4);
     Mesh m = Mesh::load_from_file("data/Frankie/Frankie.obj");
     m.compute_normales();
     n_elements= m.size_element();
@@ -59,22 +63,29 @@ void set_uniform_mvp(GLuint program)
 
 static void display_callback()
 {
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    GLuint location = glGetUniformLocation(program_id_2, "color_1");
-    glUniform3fv( location,1, &color_array[indice_couleur][0]);
-
-    glUseProgram(Programmes[id_prog]);
-    glBindVertexArray(VAO);
-    set_uniform_mvp(program_id);
-    glDrawElements(GL_TRIANGLES, n_elements, GL_UNSIGNED_INT, 0);
+  
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
+  GLuint location = glGetUniformLocation(program_id_2, "color_1");
+  glUniform3fv( location,1, &color_array[indice_couleur][0]);
+
+  static auto t_start = std::chrono::high_resolution_clock::now();
+  auto t_now = std::chrono::high_resolution_clock::now();
+  float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
+  location = glGetUniformLocation(program_id_4, "time");
+  glUniform1f(location,time);
+
+  glUseProgram(Programmes[id_prog]);
+  set_uniform_mvp(program_id);
+  glBindVertexArray(VAO);
 
 
-    glBindVertexArray(0);
-    glutSwapBuffers ();
+  glDrawElements(GL_TRIANGLES, n_elements, GL_UNSIGNED_INT, 0);
+
+
+  glBindVertexArray(0);
+  glutSwapBuffers ();
 }
 
 static void keyboard_callback(unsigned char key, int, int)
@@ -167,3 +178,5 @@ int main(int argc, char** argv)
 
   return 0;
 }
+
+
