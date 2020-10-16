@@ -12,15 +12,16 @@
 #include "external/glm/gtc/matrix_transform.hpp"
 
 
+std::vector<GLuint> Programmes;
+GLuint program_id, program_id_2;
+std::vector<std::vector<float>> color_array;
+int indice_couleur = 0;
+
 GLuint VAO;
 GLuint n_elements;
 
 // camera
 Camera cam;
-
-// Current program id
-GLuint program_id;
-
 
 void init()
 {
@@ -29,7 +30,10 @@ void init()
     glEnable(GL_DEPTH_TEST);
 
     program_id = glhelper::create_program_from_file("basic.vs", "basic.fs");
-
+    program_id_2 = glhelper::create_program_from_file("basic.vs", "color.fs");
+    
+    Programmes.push_back(program_id);
+    Programmes.push_back(program_id_2);
     Mesh m = Mesh::load_from_file("data/Frankie/Frankie.obj");
     m.compute_normales();
     n_elements= m.size_element();
@@ -57,7 +61,10 @@ static void display_callback()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(program_id);
+    GLuint location = glGetUniformLocation(program_id_2, "color_1");
+    glUniform3fv( location,1, &color_array[indice_couleur][0]);
+
+    glUseProgram(program_id_2);
     glBindVertexArray(VAO);
     set_uniform_mvp(program_id);
     glDrawElements(GL_TRIANGLES, n_elements, GL_UNSIGNED_INT, 0);
@@ -80,6 +87,16 @@ static void keyboard_callback(unsigned char key, int, int)
     case 'Q':
     case 27:
       exit(0);
+    case 'd':
+      if (indice_couleur < int(color_array.size()-1)){
+        indice_couleur = indice_couleur + 1 ;
+      }
+      break;
+    case 's':
+      if (indice_couleur != 0){
+        indice_couleur = indice_couleur - 1 ;
+      }
+      break;
   }
   glutPostRedisplay();
 }
@@ -118,6 +135,9 @@ int main(int argc, char** argv)
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowSize(cam.height(), cam.width());
   glutCreateWindow("opengl");
+  color_array.push_back({0,0,1});
+  color_array.push_back({0,1,0});
+  color_array.push_back({1,0,0});
   glutDisplayFunc(display_callback);
   glutMotionFunc(motion_callback);
   glutMouseFunc(mouse_callback);
