@@ -9,9 +9,11 @@ in vec3 v_pos[];
 
 void main(void)
 {
-for (int i = 0; i < 3; i++)
+    vec3 Tnorm = normalize(cross(v_pos[1]-v_pos[0], v_pos[2]-v_pos[0]));
+    
+    for (int i = 0; i < 3; i++)
 	{
-	  gl_Position = MVP * vec4(v_pos[i], 1.0);
+	  gl_Position = MVP * vec4(v_pos[i]+Tnorm*0.1, 1.0);
 	  EmitVertex();
 	}
 	EndPrimitive();

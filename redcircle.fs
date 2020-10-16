@@ -10,7 +10,7 @@ out vec4 color;
 
 void main()
 {
-    float eps = 0.01;
+    float eps = 0.005;
     float d = sqrt(posi.x*posi.x + posi.y*posi.y);
     if (abs(d - radius) < eps || abs(d-(3*radius/4)) < eps || abs(d-(radius/2)) < eps|| abs(d-(radius/4)) < eps){
         color = vec4(1,0,0,1);

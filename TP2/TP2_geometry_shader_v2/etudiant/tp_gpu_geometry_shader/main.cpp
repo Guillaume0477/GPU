@@ -30,10 +30,10 @@ void init()
     glClearColor(0.1, 0.1, 0.1, 0);
     glEnable(GL_DEPTH_TEST);
 
-    program_id = glhelper::create_program_from_file("basic.vs", "basic.fs");
-    program_id_2 = glhelper::create_program_from_file("basic.vs", "color.fs");
+    program_id = glhelper::create_program_from_file("basic.vs", "basic.fs", "eclate.gs");
+    program_id_2 = glhelper::create_program_from_file("basic.vs", "color.fs", "line.gs");
     program_id_3 = glhelper::create_program_from_file("basic.vs", "texture.fs");
-    program_id_4 = glhelper::create_program_from_file("basic.vs", "change_color.fs");
+    program_id_4 = glhelper::create_program_from_file("basic.vs", "change_color.fs", "basic.gs");
     
     Programmes.push_back(program_id);
     Programmes.push_back(program_id_2);

@@ -83,6 +83,37 @@ namespace glhelper
     return program_id;
   }
 
+// return id of the gpu program
+  GLuint create_program(const std::string& vs_content,
+      const std::string& fs_content, const std::string& gs_content)
+  {
+
+    GLuint vs_id = compile_shader(vs_content.c_str(),GL_VERTEX_SHADER);
+    GLuint fs_id = compile_shader(fs_content.c_str(),GL_FRAGMENT_SHADER);
+    GLuint gs_id = compile_shader(gs_content.c_str(), GL_GEOMETRY_SHADER);
+
+    GLuint program_id = glCreateProgram();
+    glAttachShader(program_id, vs_id);
+    glAttachShader(program_id, gs_id);
+    glAttachShader(program_id, fs_id);
+    
+
+    glLinkProgram(program_id);
+    check_error_link(program_id);
+    glDeleteShader(vs_id);
+    glDeleteShader(fs_id);
+    glDeleteShader(gs_id);
+
+    return program_id;
+  }
+
+  GLuint create_program_from_file(
+      const std::string& vs_file,
+      const std::string& fs_file,
+      const std::string& gs_file)
+  {
+    return create_program(read_file(vs_file), read_file(fs_file), read_file(gs_file));
+  }
 
   GLuint create_program_from_file(
       const std::string& vs_file,
@@ -90,7 +121,6 @@ namespace glhelper
   {
     return create_program(read_file(vs_file), read_file(fs_file));
   }
-
 
   GLuint load_texture(std::string filename)
   {

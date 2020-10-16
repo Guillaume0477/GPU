@@ -14,12 +14,14 @@ namespace glhelper
   // return id of the gpu program
   GLuint create_program_from_file(const std::string& vs_file,
       const std::string& fs_file);
-
+  GLuint create_program_from_file(const std::string& vs_file,
+      const std::string& fs_file, const std::string& gs_file);
 
   // return id of the gpu program
   GLuint create_program(const std::string& vs_content,
       const std::string& fs_content);
-
+  GLuint create_program(const std::string& vs_content,
+      const std::string& fs_content, const std::string& gs_content);
 
   // return id of the compiled shader
   GLuint compile_shader(const char* shader_content, GLenum shader_type);
