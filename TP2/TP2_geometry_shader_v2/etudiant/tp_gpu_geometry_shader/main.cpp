@@ -14,6 +14,7 @@
 
 std::vector<GLuint> Programmes;
 GLuint program_id, program_id_2, program_id_3, program_id_4, program_id_5;
+GLuint poilProg;
 std::vector<std::vector<float>> color_array;
 int indice_couleur = 0;
 int id_prog = 0;
@@ -36,6 +37,8 @@ void init()
     program_id_3 = glhelper::create_program_from_file("basic.vs", "texture.fs");
     program_id_4 = glhelper::create_program_from_file("basic.vs", "change_color.fs", "basic.gs");
     
+    poilProg = glhelper::create_program_from_file("basic.vs", "color.fs", "norm.gs");
+
     Programmes.push_back(program_id);
     Programmes.push_back(program_id_2);
     Programmes.push_back(program_id_3);
@@ -84,6 +87,13 @@ static void display_callback()
 
 
   glDrawElements(GL_TRIANGLES, n_elements, GL_UNSIGNED_INT, 0);
+
+  if(id_prog == 2){
+    glUseProgram(poilProg);
+    set_uniform_mvp(program_id);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, n_elements, GL_UNSIGNED_INT, 0);
+  }
 
 
   glBindVertexArray(0);
