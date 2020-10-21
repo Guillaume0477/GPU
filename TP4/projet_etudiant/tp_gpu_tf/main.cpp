@@ -46,7 +46,7 @@ void init()
   program_tf_id = glCreateProgram();
   glAttachShader(program_tf_id, shader_id);
 
-  const GLchar* attributes[] = {"pos"};
+  const GLchar* attributes[] = {"pos","vit"};
   glTransformFeedbackVaryings(program_tf_id, 1, attributes, GL_SEPARATE_ATTRIBS);
   glLinkProgram(program_tf_id);
 
@@ -58,7 +58,7 @@ void init()
   for(auto i = 0u; i < NB_PARTICULES*3; ++i)
   {
     positions[i] = 0.;
-    vitesses[i] = ((i+2)%3) == 0 ? std::fabs(distribution(generator)) : distribution(generator);
+    vitesses[i] = 0.;//((i+2)%3) == 0 ? std::fabs(distribution(generator)) : distribution(generator);
   }
 
   glGenVertexArrays(1, &VAO);
@@ -72,11 +72,15 @@ void init()
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0); 
   glEnableVertexAttribArray(0); 
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO[VITESSE0]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vitesses), vitesses, GL_DYNAMIC_DRAW);
-
   glBindBuffer(GL_ARRAY_BUFFER, VBO[POSITION1]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_DYNAMIC_DRAW);
+
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[VITESSE0]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vitesses), vitesses, GL_DYNAMIC_DRAW);
+  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0); 
+  glEnableVertexAttribArray(2); 
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO[VITESSE1]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vitesses), vitesses, GL_DYNAMIC_DRAW);
@@ -122,28 +126,44 @@ static void display_callback()
   glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VBO[1]);
   glBindBuffer(GL_ARRAY_BUFFER,  VBO[0]);
   glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,0,0);
-  //glBeginTransformFeedback(GL_TRIANGLES);
-  //glDrawElements(GL_TRIANGLES, n_elements, GL_UNSIGNED_INT, 0);
-  //glEndTransformFeedback();
   glEnableVertexAttribArray(1);  
+  //
+  // glBindVertexArray(VAO);
+  // glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, VBO[3]);
+  // glBindBuffer(GL_ARRAY_BUFFER,  VBO[2]);
+  // glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,0,0);
+  // glEnableVertexAttribArray(3);  
+
   glBeginTransformFeedback(GL_POINTS);
   glDrawArrays(GL_POINTS, 0, NB_PARTICULES);
   glEndTransformFeedback();
   glFlush();
-  glDisableVertexAttribArray(1);    
+  glDisableVertexAttribArray(1);   
+  //
+  //glDisableVertexAttribArray(3);  
+
   glDisable(GL_RASTERIZER_DISCARD);
   std::swap(VBO[0], VBO[1]);
+  //
+  //std::swap(VBO[2], VBO[3]);
 
 
-  GLfloat feedback[3];
-  glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
+  GLfloat position[3];
+  glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(position), position);
+  printf("p:%f %f %f \n", position[0], position[1], position[2]);
 
-  printf("%f %f %f \n", feedback[0], feedback[1], feedback[2]);
+  GLfloat vitesse[3];
+  glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 1, sizeof(vitesse), vitesse);
+  printf("v:%f %f %f \n", vitesse[0], vitesse[1], vitesse[2]);
+
 
   glBindVertexArray(VAO);
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  // glEnableVertexAttribArray(2);
+  // glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+  // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
   glUseProgram(program_id);
   set_uniform_mvp(program_id);
