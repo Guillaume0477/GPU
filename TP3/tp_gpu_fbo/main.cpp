@@ -24,6 +24,11 @@ Camera cam;
 // Current program id
 GLuint program_id;
 
+//framebuffer
+GLuint framebuffer;
+GLuint texColorBuffer;
+GLuint rboDepthStencil;
+
 
 void init()
 {
@@ -43,6 +48,28 @@ void init()
     Mesh m_wall = Mesh::create_grid(2);
     m_wall.apply_matrix(glm::translate(glm::mat4(1.), glm::vec3(0.f,0.35f,0.f)));
     VAO_wall = m_wall.load_to_gpu();
+
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    glGenTextures(1, &texColorBuffer);
+    glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer,0);
+
+
+    glGenRenderbuffers(1, &rboDepthStencil);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboDepthStencil);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+
+    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboDepthStencil);
+
+    std::cout<<glCheckFramebufferStatus(GL_FRAMEBUFFER)<<GL_FRAMEBUFFER_COMPLETE<<std::endl;
+    
 }
 
 void set_uniform_mvp(GLuint program)
@@ -59,10 +86,21 @@ void set_uniform_mvp(GLuint program)
 static void display_callback()
 {
 
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    // Bind our framebuffer and draw 3D scene (spinning cube)
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glBindVertexArray(VAO);
+    glEnable(GL_DEPTH_TEST);
+    glUseProgram(program_id);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);  
+    
+    
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Affichage du sol
+
     glUseProgram(program_id);
     glBindVertexArray(VAO_wall);
     set_uniform_mvp(program_id);
@@ -73,6 +111,19 @@ static void display_callback()
     glBindVertexArray(VAO);
     set_uniform_mvp(program_id);
     glDrawElements(GL_TRIANGLES, n_elements, GL_UNSIGNED_INT, 0);
+
+    // Bind default framebuffer and draw contents of our framebuffer
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    //glViewport(0, 0, window_width(), window_height());
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glBlitFramebuffer(
+        0, 0, 800, 600, // rectangle origine dans READ_FRAMEBUFFER
+        0, 0, 800, 600, // rectangle destination dans DRAW_FRAMEBUFFER
+        GL_COLOR_BUFFER_BIT, GL_LINEAR);     
+
 
     glBindVertexArray(0);
     glutSwapBuffers ();
