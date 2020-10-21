@@ -29,6 +29,8 @@ Camera cam;
 // Current program id
 GLuint program_id;
 
+GLuint program_tf_id;
+
 
 int nframe;
 std::chrono::time_point<std::chrono::high_resolution_clock> start;
@@ -38,6 +40,15 @@ void init()
   program_id = glhelper::create_program_from_file("basic.vs", "basic.fs");
   start = std::chrono::high_resolution_clock::now();
 
+  // create transform feedback
+  auto content =  glhelper::read_file("tf.vs");
+  auto shader_id = glhelper::compile_shader(content.c_str(), GL_VERTEX_SHADER);
+  program_tf_id = glCreateProgram();
+  glAttachShader(program_tf_id, shader_id);
+
+  const GLchar* attributes[] = {"pos"};
+  glTransformFeedbackVaryings(program_tf_id, 1, attributes, GL_SEPARATE_ATTRIBS);
+  glLinkProgram(program_tf_id);
 
   GLfloat positions[NB_PARTICULES*3];
   GLfloat vitesses[NB_PARTICULES*3];
@@ -103,9 +114,39 @@ static void display_callback()
 
   glClear(GL_COLOR_BUFFER_BIT);
 
+
+ // displacement with tf
+  glEnable(GL_RASTERIZER_DISCARD);
+  glUseProgram(program_tf_id);
+  glBindVertexArray(VAO);
+  glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VBO[1]);
+  glBindBuffer(GL_ARRAY_BUFFER,  VBO[0]);
+  glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,0,0);
+  //glBeginTransformFeedback(GL_TRIANGLES);
+  //glDrawElements(GL_TRIANGLES, n_elements, GL_UNSIGNED_INT, 0);
+  //glEndTransformFeedback();
+  glEnableVertexAttribArray(1);  
+  glBeginTransformFeedback(GL_POINTS);
+  glDrawArrays(GL_POINTS, 0, NB_PARTICULES);
+  glEndTransformFeedback();
+  glFlush();
+  glDisableVertexAttribArray(1);    
+  glDisable(GL_RASTERIZER_DISCARD);
+  std::swap(VBO[0], VBO[1]);
+
+
+  GLfloat feedback[3];
+  glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
+
+  printf("%f %f %f \n", feedback[0], feedback[1], feedback[2]);
+
+  glBindVertexArray(VAO);
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
   glUseProgram(program_id);
   set_uniform_mvp(program_id);
-
   glDrawArrays(GL_POINTS, 0, NB_PARTICULES);
 
   glutSwapBuffers ();
