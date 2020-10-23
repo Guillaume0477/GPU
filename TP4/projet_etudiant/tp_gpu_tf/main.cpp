@@ -47,7 +47,7 @@ void init()
   glAttachShader(program_tf_id, shader_id);
 
   const GLchar* attributes[] = {"pos","vit"};
-  glTransformFeedbackVaryings(program_tf_id, 1, attributes, GL_SEPARATE_ATTRIBS);
+  glTransformFeedbackVaryings(program_tf_id, 2, attributes, GL_SEPARATE_ATTRIBS);
   glLinkProgram(program_tf_id);
 
   GLfloat positions[NB_PARTICULES*3];
@@ -58,7 +58,7 @@ void init()
   for(auto i = 0u; i < NB_PARTICULES*3; ++i)
   {
     positions[i] = 0.;
-    vitesses[i] = 0.;//((i+2)%3) == 0 ? std::fabs(distribution(generator)) : distribution(generator);
+    vitesses[i] = ((i+2)%3) == 0 ? std::fabs(distribution(generator)) : distribution(generator);
   }
 
   glGenVertexArrays(1, &VAO);
@@ -79,8 +79,8 @@ void init()
   glBindBuffer(GL_ARRAY_BUFFER, VBO[VITESSE0]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vitesses), vitesses, GL_DYNAMIC_DRAW);
   
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0); 
-  glEnableVertexAttribArray(2); 
+  // glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0); 
+  // glEnableVertexAttribArray(2); 
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO[VITESSE1]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vitesses), vitesses, GL_DYNAMIC_DRAW);
@@ -119,20 +119,30 @@ static void display_callback()
   glClear(GL_COLOR_BUFFER_BIT);
 
 
+  static auto t_start = std::chrono::high_resolution_clock::now();
+  auto t_now = std::chrono::high_resolution_clock::now();
+  float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
+
+
  // displacement with tf
   glEnable(GL_RASTERIZER_DISCARD);
   glUseProgram(program_tf_id);
   glBindVertexArray(VAO);
+
+  GLuint location = glGetUniformLocation(program_tf_id, "time");
+  glUniform1f(location,time);
+  std::cout<<"t:"<<time<<std::endl;
+
   glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VBO[1]);
   glBindBuffer(GL_ARRAY_BUFFER,  VBO[0]);
   glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,0,0);
   glEnableVertexAttribArray(1);  
   //
-  // glBindVertexArray(VAO);
-  // glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, VBO[3]);
-  // glBindBuffer(GL_ARRAY_BUFFER,  VBO[2]);
-  // glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,0,0);
-  // glEnableVertexAttribArray(3);  
+  glBindVertexArray(VAO);
+  glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, VBO[3]);
+  glBindBuffer(GL_ARRAY_BUFFER,  VBO[2]);
+  glVertexAttribPointer(2,3,GL_FLOAT, GL_FALSE,0,0);
+  glEnableVertexAttribArray(2);  
 
   glBeginTransformFeedback(GL_POINTS);
   glDrawArrays(GL_POINTS, 0, NB_PARTICULES);
@@ -140,20 +150,23 @@ static void display_callback()
   glFlush();
   glDisableVertexAttribArray(1);   
   //
-  //glDisableVertexAttribArray(3);  
+  glDisableVertexAttribArray(3);  
 
   glDisable(GL_RASTERIZER_DISCARD);
   std::swap(VBO[0], VBO[1]);
   //
-  //std::swap(VBO[2], VBO[3]);
+  std::swap(VBO[2], VBO[3]);
 
 
   GLfloat position[3];
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VBO[1]);
   glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(position), position);
   printf("p:%f %f %f \n", position[0], position[1], position[2]);
 
   GLfloat vitesse[3];
-  glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 1, sizeof(vitesse), vitesse);
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, VBO[3]);
+
+  glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(vitesse), vitesse);
   printf("v:%f %f %f \n", vitesse[0], vitesse[1], vitesse[2]);
 
 
@@ -170,6 +183,8 @@ static void display_callback()
   glDrawArrays(GL_POINTS, 0, NB_PARTICULES);
 
   glutSwapBuffers ();
+  // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0); 
+  // glEnableVertexAttribArray(2); 
 
   compute_fps();
   //only needed for benchmark
