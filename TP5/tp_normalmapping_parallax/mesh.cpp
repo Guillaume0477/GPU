@@ -258,13 +258,13 @@ void Mesh::apply_matrix(const glm::mat4& m)
   {
     glm::vec4 p(vertices[i].position, 1.);
     glm::vec4 n(vertices[i].normal, 0.);
-    glm::vec4 t(vertices[i].tangant, 0.);
+    //glm::vec4 t(vertices[i].tangant, 0.);
     p = m * p;
     n = m * n;
-    t = m * t;
+    //t = m * t;
     vertices[i].position = p;
     vertices[i].normal = n;
-    vertices[i].tangant = t;
+    //vertices[i].tangant = t;
   }
 }
 
