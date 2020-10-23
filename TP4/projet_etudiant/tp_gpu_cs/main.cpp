@@ -24,6 +24,9 @@ GLuint cs_id, cs_program_id;
 
 int nframe;
 std::chrono::time_point<std::chrono::high_resolution_clock> start;
+std::chrono::time_point<std::chrono::high_resolution_clock> getdt;
+std::chrono::time_point<std::chrono::high_resolution_clock> curdt = std::chrono::high_resolution_clock::now();
+float dt = 0.0;
 
 void init()
 {
@@ -100,19 +103,25 @@ static void display_callback()
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, VBO[0]);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, VBO[1]);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VBO[1]);
+
+  GLuint location = glGetUniformLocation(cs_program_id, "dt");
+  glUniform1f(location, dt);
+
   glDispatchCompute(NB_PARTICULES/10, 1, 1);
   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
   std::vector<float> buff(3*NB_PARTICULES); // n is the size
   glGetNamedBufferSubData( VBO[0] ,0 , 3* NB_PARTICULES * sizeof(float), buff.data());
 
-  std::cout << buff[0] << ' ' << buff[1] << ' ' << buff[2] << std::endl;
-
   glUseProgram(program_id);
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
   glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE, 0,0);
   glEnableVertexAttribArray(0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+  glVertexAttribPointer(1,3,GL_FLOAT, GL_FALSE, 0,0);
+  glEnableVertexAttribArray(1);
 
   set_uniform_mvp(program_id);
 
@@ -121,6 +130,10 @@ static void display_callback()
   glutSwapBuffers();
 
   compute_fps();
+
+  getdt = std::chrono::high_resolution_clock::now();
+  dt = ((getdt - curdt).count() / 1e9);
+  curdt = getdt;
   //only needed for benchmark
   //glutPostRedisplay();
 }
