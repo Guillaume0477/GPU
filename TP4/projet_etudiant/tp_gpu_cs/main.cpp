@@ -20,7 +20,7 @@ Camera cam;
 
 // Current program id
 GLuint program_id;
-
+GLuint cs_id, cs_program_id;
 
 int nframe;
 std::chrono::time_point<std::chrono::high_resolution_clock> start;
@@ -28,6 +28,14 @@ std::chrono::time_point<std::chrono::high_resolution_clock> start;
 void init()
 {
   program_id = glhelper::create_program_from_file("basic.vs", "basic.fs");
+
+  cs_id = glhelper::compile_shader(glhelper::read_file("cs.vs").c_str(), GL_COMPUTE_SHADER);
+  cs_program_id = glCreateProgram();
+  glAttachShader(cs_program_id, cs_id);
+  glLinkProgram(cs_program_id);
+  glhelper::check_error_link(cs_program_id);
+  glDeleteShader(cs_id);
+
   start = std::chrono::high_resolution_clock::now();
 
 
@@ -55,6 +63,7 @@ void init()
 
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   glPointSize(3);
+
 }
 
 void compute_fps()
@@ -86,12 +95,30 @@ static void display_callback()
   
   glClear(GL_COLOR_BUFFER_BIT);
 
+  glUseProgram(cs_program_id);
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, VBO[0]);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, VBO[0]);
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, VBO[1]);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VBO[1]);
+  glDispatchCompute(NB_PARTICULES/10, 1, 1);
+  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+  std::vector<float> buff(3*NB_PARTICULES); // n is the size
+  glGetNamedBufferSubData( VBO[0] ,0 , 3* NB_PARTICULES * sizeof(float), buff.data());
+
+  std::cout << buff[0] << ' ' << buff[1] << ' ' << buff[2] << std::endl;
+
   glUseProgram(program_id);
+  glBindVertexArray(VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+  glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE, 0,0);
+  glEnableVertexAttribArray(0);
+
   set_uniform_mvp(program_id);
 
   glDrawArrays(GL_POINTS, 0, NB_PARTICULES);
 
-  glutSwapBuffers ();
+  glutSwapBuffers();
 
   compute_fps();
   //only needed for benchmark
