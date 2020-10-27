@@ -11,6 +11,7 @@ uniform sampler2D textureSampler;
 uniform vec3 camera;
 uniform sampler2D textureSampler1;
 uniform sampler2D textureNormals;
+uniform sampler2D textureAO;
 
 void main()
 {
@@ -24,6 +25,10 @@ void main()
     float Kd= 0.8;
     float Ks= 0.6;
     float Ia= Ka;
+    
+    //Comment to remove ambiant occlusion
+    Ia = Ia*texture(textureAO, uv_obj).x;
+    
     vec3 Ul= normalize(vec3(0.0,2.0,0.0)-p_world);
     Ul = TBN * Ul;
     float Id= Kd * dot(n_toUse, Ul);

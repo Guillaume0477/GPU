@@ -52,6 +52,12 @@ void init()
   GLuint location2 = glGetUniformLocation(program_id, "textureNormals");
   glUniform1i(location2, 2);
 
+  glActiveTexture(GL_TEXTURE0 + 3);
+  GLuint tex3 = glhelper::load_texture("./data/Rocks002_2K/Rocks002_2K_AmbientOcclusion.png");
+  GLuint location3 = glGetUniformLocation(program_id, "textureAO");
+  glUniform1i(location3, 3);
+
+
 }
 
 void set_uniform_mvp(GLuint program)
