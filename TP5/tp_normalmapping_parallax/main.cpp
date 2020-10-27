@@ -35,7 +35,23 @@ void init()
   n_elements = m.size_element();
   VAO = m.load_to_gpu();  CHECK_GL_ERROR();
 
-  glhelper::load_texture("./data/Rocks002_2K/Rocks002_2K_Color.png");
+  glUseProgram(program_id);
+
+  glActiveTexture(GL_TEXTURE0);
+  GLuint tex0 = glhelper::load_texture("./data/Rocks002_2K/Rocks002_2K_Color.png");
+  GLuint location = glGetUniformLocation(program_id, "textureSampler");
+  glUniform1i(location, 0);
+
+  glActiveTexture(GL_TEXTURE0 + 1);
+  GLuint tex1 = glhelper::load_texture("./data/Rocks002_2K/Rocks002_2K_Displacement.png");
+  GLuint location1 = glGetUniformLocation(program_id, "textureSampler1");
+  glUniform1i(location1, 1);
+
+  glActiveTexture(GL_TEXTURE0 + 2);
+  GLuint tex2 = glhelper::load_texture("./data/Rocks002_2K/Rocks002_2K_Normal.png");
+  GLuint location2 = glGetUniformLocation(program_id, "textureNormals");
+  glUniform1i(location2, 2);
+
 }
 
 void set_uniform_mvp(GLuint program)

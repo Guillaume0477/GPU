@@ -1,7 +1,7 @@
 #include "camera.h"
 
 Camera::Camera()
-  : pos(3.,-1.5,3.), 
+  :pos(3.,-1.5,3.), 
   target(0.,0.,0.), 
   up(0,1,0),
   distance(glm::distance(pos, target)),
