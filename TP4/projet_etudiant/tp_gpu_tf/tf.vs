@@ -8,9 +8,38 @@ out vec3 pos;
 out vec3 vit;
 
 
+
+float rand(float pos){
+    return fract(sin(pos*12.9898) * 43758.5453)-0.5;
+}
+
+
 void main()
 {
-	pos = position + vitesse*time/1000;//*time;
-    vit = vitesse ; //vec3(0.0f, -0.05f, 0.0f);//*time;
+    bool test;
+    float mass = 0.01;
+    float dt = 0.025;
+
+
+    pos = position + vitesse*dt;//*time;
+    vit = vitesse + vec3(0.0f, -mass*9.81*dt, 0.0f);//*time;
+
+    test = (pos.y > -2) ; //&& (pos[3*i+1] < 2);
+    // test = test && (pos[3*i] > -2) && (pos[3*i] < 2);
+    // test = test && (pos[3*i+2] > -2) && (pos[3*i+2] < 2);
+
+    if (test == false){
+        
+        vit.x = rand(pos.x);
+        vit.y = (rand(pos.y)+1);
+        vit.z = rand(pos.z);
+
+        pos.x = 0.0;
+        pos.y = 0.0;
+        pos.z = 0.0;
+
+    }
+
+
 
 };
