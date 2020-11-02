@@ -2,7 +2,7 @@
 layout (location = 0) in vec3 position;
 layout (location = 2) in vec3 vitesse;
 
-uniform float time;
+uniform float dt;
 
 out vec3 pos;
 out vec3 vit;
@@ -18,7 +18,6 @@ void main()
 {
     bool test;
     float mass = 0.01;
-    float dt = 0.025;
 
 
     pos = position + vitesse*dt;//*time;

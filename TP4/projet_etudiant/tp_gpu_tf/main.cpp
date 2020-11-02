@@ -34,6 +34,9 @@ GLuint program_tf_id;
 
 int nframe;
 std::chrono::time_point<std::chrono::high_resolution_clock> start;
+std::chrono::time_point<std::chrono::high_resolution_clock> getdt;
+std::chrono::time_point<std::chrono::high_resolution_clock> curdt = std::chrono::high_resolution_clock::now();
+float dt = 0.0;
 
 void init()
 {
@@ -118,20 +121,14 @@ static void display_callback()
 
   glClear(GL_COLOR_BUFFER_BIT);
 
-
-  static auto t_start = std::chrono::high_resolution_clock::now();
-  auto t_now = std::chrono::high_resolution_clock::now();
-  float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
-
-
  // displacement with tf
   glEnable(GL_RASTERIZER_DISCARD);
   glUseProgram(program_tf_id);
   glBindVertexArray(VAO);
 
-  GLuint location = glGetUniformLocation(program_tf_id, "time");
-  glUniform1f(location,time);
-  std::cout<<"t:"<<time<<std::endl;
+  GLuint location = glGetUniformLocation(program_tf_id, "dt");
+  glUniform1f(location, dt);
+  std::cout<<"t:"<<dt<<std::endl;
 
   glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VBO[1]);
   glBindBuffer(GL_ARRAY_BUFFER,  VBO[0]);
@@ -189,6 +186,10 @@ static void display_callback()
   compute_fps();
   //only needed for benchmark
   //glutPostRedisplay();
+
+  getdt = std::chrono::high_resolution_clock::now();
+  dt = ((getdt - curdt).count() / 1e9);
+  curdt = getdt;
 }
 
 static void keyboard_callback(unsigned char key, int, int)
