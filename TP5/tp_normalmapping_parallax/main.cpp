@@ -38,17 +38,17 @@ void init()
   glUseProgram(program_id);
 
   glActiveTexture(GL_TEXTURE0);
-  GLuint tex0 = glhelper::load_texture("./data/bricks2.jpg"); //"./data/Rocks002_2K/Rocks002_2K_Color.png");
+  GLuint tex0 = glhelper::load_texture("./data/Rocks002_2K/Rocks002_2K_Color.png");//"./data/bricks2.jpg"); //
   GLuint location = glGetUniformLocation(program_id, "textureSampler");
   glUniform1i(location, 0);
 
   glActiveTexture(GL_TEXTURE0 + 1);
-  GLuint tex1 = glhelper::load_texture("./data/bricks2_disp.jpg"); //"./data/Rocks002_2K/Rocks002_2K_Displacement.png");
+  GLuint tex1 = glhelper::load_texture("./data/Rocks002_2K/Rocks002_2K_Displacement.png");//"./data/bricks2_disp.jpg"); //
   GLuint location1 = glGetUniformLocation(program_id, "textureSampler1");
   glUniform1i(location1, 1);
 
   glActiveTexture(GL_TEXTURE0 + 2);
-  GLuint tex2 = glhelper::load_texture("./data/bricks2_normal.jpg"); //"./data/Rocks002_2K/Rocks002_2K_Normal.png");
+  GLuint tex2 = glhelper::load_texture("./data/Rocks002_2K/Rocks002_2K_Normal.png");//"./data/bricks2_normal.jpg"); //
   GLuint location2 = glGetUniformLocation(program_id, "textureNormals");
   glUniform1i(location2, 2);
 
