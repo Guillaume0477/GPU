@@ -26,7 +26,7 @@ void main()
   vec4 tex = texture(textureSampler1, uv_obj);
 
   // Uncomment to modify the heigh of the object
-  p_world.y = p_world.y + tex.x*0.2;
+  p_world.y = p_world.y + tex.x*0.7;
 
   vec3 t_world = mat3(model) * tangant.xyz;
   n_world = mat3(model) * normal;

@@ -38,12 +38,60 @@ void init()
   glUseProgram(program_id);
 
   glActiveTexture(GL_TEXTURE0);
-  GLuint tex0 = glhelper::load_texture("./data/Rocks002_2K/Rocks002_2K_Color.png");//"./data/bricks2.jpg"); //
+  //GLuint tex0 = glhelper::load_texture("./data/Height/pilou.png");//"./data/bricks2.jpg"); //
+  //GLuint tex0 = glhelper::load_texture("./data/Height/pilouTrue.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/access.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/access_Blur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/access_Smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/avslope.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/avslope_Blur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/avslope_Smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/gradient.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/gradient_Blur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/gradient_Smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/hauteur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/hauteur_Blur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/hauteur_Smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/hauteur_phong.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/hauteur_phong_Blur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/hauteur_phong_Smooth.png");
+  GLuint tex0 = glhelper::load_texture("./data/Height/lapla.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/lapla_Blur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/lapla_Smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/slope.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/slope_Blur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/slope_Smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamArea.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamArea_Blur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamArea_Smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamAreaStreepest.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamAreaStreepest_Blur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamAreaStreepest_Smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamPower.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamPower_Blur.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamPower_Smooth.png");
+
+
+
+
+
+
+
+
+  //GLuint tex0 = glhelper::load_texture("./data/Height/lapla.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/pilou_smooth.png");//"./data/bricks2.jpg"); //
+  //GLuint tex0 = glhelper::load_texture("./data/Height/pilouTrue_smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/grad_smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/lapla_smooth.png");
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamAreaStreepest_Smooth.png"); 
+  //GLuint tex0 = glhelper::load_texture("./data/Height/StreamPower_Smooth.png"); 
+
+
   GLuint location = glGetUniformLocation(program_id, "textureSampler");
   glUniform1i(location, 0);
 
-  glActiveTexture(GL_TEXTURE0 + 1);
-  GLuint tex1 = glhelper::load_texture("./data/Rocks002_2K/Rocks002_2K_Displacement.png");//"./data/bricks2_disp.jpg"); //
+  glActiveTexture(GL_TEXTURE0 + 1); 
+  GLuint tex1 = glhelper::load_texture("./data/Height/heightmap3.png");//"./data/bricks2_disp.jpg"); //
   GLuint location1 = glGetUniformLocation(program_id, "textureSampler1");
   glUniform1i(location1, 1);
 

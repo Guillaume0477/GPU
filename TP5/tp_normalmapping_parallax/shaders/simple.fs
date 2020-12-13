@@ -53,8 +53,8 @@ void main()
     vec3 t= normalize(TBN*camera - TBN*p_world);
     vec3 s= normalize(reflect(Ul,n_toUse));
     float es= 256;
-    float Is= Ks * pow(dot(s,t),es);
+    float Is= Ks * pow(dot(s,t),1);
 
     vec4 c = texture( textureSampler, uv_obj_toUse );
-    color = (Ia + Id)*c + Is ;
+    color = (Ia + Id)*c;// + Is ;
 };
